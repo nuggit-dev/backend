@@ -17,9 +17,10 @@
 extern crate nuggit;
 
 fn main() {
-    let mut storage = nuggit::storage::InMemory::new();
+    let storage = nuggit::storage::InMemory::new();
+    let mut service = nuggit::Service::new(storage);
 
-    storage
+    service
         .create("frombus", "Our next big thing 🚀", "monty")
         .unwrap();
 }

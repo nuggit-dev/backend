@@ -14,21 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Represents repository metadata.
-#[derive(Clone, Debug, PartialEq)]
-pub struct Repo {
-    // The name of the repository.
-    pub name: String,
-    // A short description of the repository.
-    pub description: String,
-    // ID of the user who created the repository.
-    pub creator: String,
-    // Date and time at which the repository was created.
-    pub created: String,
+use crate::Repo;
+
+// Stores repository metadata.
+pub trait Storage {
+    // Creates a repository.
+    fn create(&mut self, name: &str, description: &str, creator: &str) -> Option<Repo>;
+    // Retrieves a repository.
+    fn retrieve(&self, name: &str) -> Option<Repo>;
 }
 
-pub mod service;
-pub use service::Service;
-
-pub mod storage;
-pub use storage::Storage;
+pub mod inmemory;
+pub use inmemory::InMemory;

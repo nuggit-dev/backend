@@ -15,6 +15,7 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 extern crate nuggit;
+use crate::nuggit::storage::Storage;
 
 #[test]
 fn create_ok_if_repo_does_not_exist() {
@@ -35,18 +36,16 @@ fn create_ok_if_repo_does_not_exist() {
 }
 
 #[test]
-#[should_panic(expected = "AlreadyExists")]
 fn create_error_if_repo_already_exists() {
     let mut s = nuggit::storage::InMemory::new();
     s.create("test", "", "").unwrap();
-    s.create("test", "", "").unwrap();
+    assert!(s.create("test", "", "").is_none());
 }
 
 #[test]
-#[should_panic(expected = "NotFound")]
 fn retrieve_error_if_repo_does_not_exist() {
     let s = nuggit::storage::InMemory::new();
-    s.retrieve("test").unwrap();
+    assert!(s.retrieve("test").is_none());
 }
 
 #[test]

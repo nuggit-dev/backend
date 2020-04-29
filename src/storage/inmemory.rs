@@ -14,18 +14,12 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+use crate::storage::Storage;
 use crate::Repo;
 use std::collections::HashMap;
 
-// Represents a storage error.
-#[derive(Debug)]
-pub enum Error {
-    AlreadyExists,
-    NotFound,
-}
-
-// In-memory storage for repositories.
-// Note, that this storage neither thread-safe nor efficient.
+// Implements in-memory storage of repository metadata.
+// Note, that this storage is neither thread-safe nor efficient.
 // It's only meant for testing.
 pub struct InMemory {
     s: HashMap<String, Repo>,
@@ -36,11 +30,13 @@ impl InMemory {
     pub fn new() -> InMemory {
         InMemory { s: HashMap::new() }
     }
+}
 
+impl Storage for InMemory {
     // Creates a repository.
-    pub fn create(&mut self, name: &str, description: &str, creator: &str) -> Result<Repo, Error> {
+    fn create(&mut self, name: &str, description: &str, creator: &str) -> Option<Repo> {
         if self.s.contains_key(name) {
-            return Err(Error::AlreadyExists);
+            return None;
         }
 
         let created = "2020-04-28T13:48:01.778470";
@@ -54,7 +50,7 @@ impl InMemory {
             },
         );
 
-        Ok(Repo {
+        Some(Repo {
             name: name.to_owned(),
             description: description.to_owned(),
             creator: creator.to_owned(),
@@ -63,10 +59,10 @@ impl InMemory {
     }
 
     // Retrieves a repository.
-    pub fn retrieve(&self, name: &str) -> Result<Repo, Error> {
+    fn retrieve(&self, name: &str) -> Option<Repo> {
         match self.s.get(name) {
-            Some(r) => Ok(r.clone()),
-            None => Err(Error::NotFound),
+            Some(r) => Some(r.clone()),
+            None => None,
         }
     }
 }

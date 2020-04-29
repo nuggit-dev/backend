@@ -14,12 +14,17 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-extern crate nuggit;
-
-fn main() {
-    let mut storage = nuggit::storage::InMemory::new();
-
-    storage
-        .create("frombus", "Our next big thing 🚀", "monty")
-        .unwrap();
+// Represents a repository.
+#[derive(Clone, Debug, PartialEq)]
+pub struct Repo {
+    // The name of the repository.
+    pub name: String,
+    // A short description of the repository.
+    pub description: String,
+    // ID of the user who created the repository.
+    pub creator: String,
+    // Date and time at which the repository was created.
+    pub created: String,
 }
+
+pub mod storage;

@@ -18,22 +18,22 @@ use crate::storage::Storage;
 use crate::Repo;
 use std::collections::HashMap;
 
-// Implements in-memory storage of repository metadata.
-// Note, that this storage is neither thread-safe nor efficient.
-// It's only meant for testing.
+/// Implements in-memory storage of repository metadata.
+/// Note, that this storage is neither thread-safe nor efficient.
+/// It's only meant for testing.
 pub struct InMemory {
     s: HashMap<String, Repo>,
 }
 
 impl InMemory {
-    // Creates an empty storage.
+    /// Creates an empty storage.
     pub fn new() -> InMemory {
         InMemory { s: HashMap::new() }
     }
 }
 
 impl Storage for InMemory {
-    // Creates a repository.
+    /// Creates a repository.
     fn create(&mut self, name: &str, description: &str, creator: &str) -> Option<Repo> {
         if self.s.contains_key(name) {
             return None;
@@ -58,7 +58,7 @@ impl Storage for InMemory {
         })
     }
 
-    // Retrieves a repository.
+    /// Retrieves a repository.
     fn retrieve(&self, name: &str) -> Option<Repo> {
         match self.s.get(name) {
             Some(r) => Some(r.clone()),

@@ -16,11 +16,11 @@
 
 use crate::Repo;
 
-// Stores repository metadata.
+/// Stores repository metadata.
 pub trait Storage {
-    // Creates a repository.
+    /// Creates a repository.
     fn create(&mut self, name: &str, description: &str, creator: &str) -> Option<Repo>;
-    // Retrieves a repository.
+    /// Retrieves a repository.
     fn retrieve(&self, name: &str) -> Option<Repo>;
 }
 

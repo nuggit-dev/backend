@@ -17,32 +17,48 @@
 use crate::storage::Storage;
 use crate::Repo;
 
-// Represents a service error.
-#[derive(Debug)]
+/// Represents a service error.
+#[derive(Debug, PartialEq)]
 pub enum Error {
-    // Returned if a repository already exists.
+    /// Returned if a repository already exists.
     AlreadyExists,
-    // Returned if a repository is not found.
+    /// Returned if a repository is not found.
     NotFound,
+    /// Returned if repository name is invalid.
+    InvalidName,
+    /// Returned if repository description is invalid.
+    InvalidDescription,
 }
 
-// Manages repositories and their metadata.
+/// Manages repositories and their metadata.
 pub struct Service<T: Storage> {
     storage: T,
 }
 
 impl<T: Storage> Service<T> {
-    // Creates a new service.
+    /// Creates a new service.
     pub fn new(storage: T) -> Service<T> {
         Service { storage }
     }
-    // Creates a repository.
+
+    /// Creates a repository if its `name` and `description` is valid.
     pub fn create(&mut self, name: &str, description: &str, creator: &str) -> Result<Repo, Error> {
+        let name_len = name.len();
+        if name_len == 0 || name_len > 64 || !name.is_ascii() {
+            return Err(Error::InvalidName);
+        }
+
+        // Description is UTF-8, so we count Unicode Scalar Values.
+        if description.chars().count() > 256 {
+            return Err(Error::InvalidDescription);
+        }
+
         self.storage
             .create(name, description, creator)
             .ok_or(Error::AlreadyExists)
     }
-    // Retrieves a repository.
+
+    /// Retrieves a repository.
     pub fn retrieve(&self, name: &str) -> Result<Repo, Error> {
         self.storage.retrieve(name).ok_or(Error::NotFound)
     }

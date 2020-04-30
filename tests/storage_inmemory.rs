@@ -36,20 +36,20 @@ fn create_ok_if_repo_does_not_exist() {
 }
 
 #[test]
-fn create_error_if_repo_already_exists() {
+fn create_none_if_repo_already_exists() {
     let mut s = nuggit::storage::InMemory::new();
     s.create("test", "", "").unwrap();
     assert!(s.create("test", "", "").is_none());
 }
 
 #[test]
-fn retrieve_error_if_repo_does_not_exist() {
+fn retrieve_none_if_repo_does_not_exist() {
     let s = nuggit::storage::InMemory::new();
     assert!(s.retrieve("test").is_none());
 }
 
 #[test]
-fn retrieve_ok_if_repo_exists() {
+fn retrieve_some_if_repo_exists() {
     let mut s = nuggit::storage::InMemory::new();
 
     let expected = nuggit::Repo {

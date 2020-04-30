@@ -12,8 +12,8 @@ You can retrieve individual repos as well as list all repos.
 
 | Name | Type | Description |
 |------|------|-------------|
-| `name` | `string` | The name of the repository. This may be up to 64 characters. |
-| `description` | `string` | A short description of the repository. This may be up to 256 characters. |
+| `name` | `string` | The name of the repository. This must be an ASCII string up to 64 characters. |
+| `description` | `string` | A short description of the repository. This must be a UTF-8 encoded string up to 256 characters. |
 | `creator` | `string` | ID of the user who created the repository. |
 | `created` | `string` | Date and time at which the repository was created. This must be formatted as [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601). |
 
@@ -27,8 +27,8 @@ To create a repository, you create a `Repo` object.
 
 | Name | Type | Description |
 |------|------|-------------|
-| `name` | `string` | **Required**. The name of the repository. This may be up to 64 characters. |
-| `description` | `string` | A short description of the repository. This may be up to 256 characters. |
+| `name` | `string` | **Required**. The name of the repository. This must be an ASCII string up to 64 characters. |
+| `description` | `string` | A short description of the repository. This must be a UTF-8 encoded string up to 256 characters. |
 
 **Example request**
 

@@ -14,16 +14,16 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-// Represents repository metadata.
-#[derive(Clone, Debug, PartialEq)]
+/// Represents repository metadata.
+#[derive(Clone, Debug, Default, PartialEq)]
 pub struct Repo {
-    // The name of the repository.
+    /// The name of the repository.
     pub name: String,
-    // A short description of the repository.
+    /// A short description of the repository.
     pub description: String,
-    // ID of the user who created the repository.
+    /// ID of the user who created the repository.
     pub creator: String,
-    // Date and time at which the repository was created.
+    /// Date and time at which the repository was created.
     pub created: String,
 }
 

@@ -18,7 +18,6 @@ extern crate nuggit;
 
 use nuggit::service::Error;
 use nuggit::Repo;
-use std::iter::FromIterator;
 
 mod mock;
 
@@ -39,8 +38,7 @@ fn create_error_if_name_is_too_long() {
     let m: mock::storage::Mock = Default::default();
     let mut s = nuggit::Service::new(m);
 
-    // Maybe there's a shorter way to create a long string.
-    let name = String::from_iter(['t'; 65].iter());
+    let name = "t".repeat(65);
     let err = s.create(name.as_str(), "", "").err();
     assert!(err.is_some());
     assert_eq!(err.unwrap(), Error::InvalidName);
@@ -62,8 +60,7 @@ fn create_error_if_description_is_too_long() {
     let m: mock::storage::Mock = Default::default();
     let mut s = nuggit::Service::new(m);
 
-    // Maybe there's a shorter way to create a long string.
-    let description = String::from_iter(['t'; 257].iter());
+    let description = "t".repeat(257);
     let err = s.create("test", description.as_str(), "").err();
     assert!(err.is_some());
     assert_eq!(err.unwrap(), Error::InvalidDescription);

@@ -43,8 +43,7 @@ impl<T: Storage> Service<T> {
 
     /// Creates a repository if its `name` and `description` is valid.
     pub fn create(&mut self, name: &str, description: &str, creator: &str) -> Result<Repo, Error> {
-        let name_len = name.len();
-        if name_len == 0 || name_len > 64 || !name.is_ascii() {
+        if name.is_empty() || name.len() > 64 || !name.is_ascii() {
             return Err(Error::InvalidName);
         }
 

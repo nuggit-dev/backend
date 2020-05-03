@@ -14,13 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-extern crate nuggit;
+use crate::Service;
+use warp::Filter;
 
-#[tokio::main]
-async fn main() {
-    let storage = nuggit::storage::InMemory::new();
-    let service = nuggit::Nuggit::new(storage);
-    let api = nuggit::endpoints::make(service);
-
-    warp::serve(api).run(([127, 0, 0, 1], 8080)).await;
+pub fn with_service(
+    s: impl Service,
+) -> impl Filter<Extract = (impl Service,), Error = std::convert::Infallible> + Clone {
+    warp::any().map(move || s.clone())
 }

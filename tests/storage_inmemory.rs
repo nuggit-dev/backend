@@ -17,8 +17,8 @@
 extern crate nuggit;
 use crate::nuggit::storage::Storage;
 
-#[test]
-fn create_ok_if_repo_does_not_exist() {
+#[tokio::test]
+async fn create_ok_if_repo_does_not_exist() {
     let mut s = nuggit::storage::InMemory::new();
 
     let expected = nuggit::Repo {
@@ -30,26 +30,29 @@ fn create_ok_if_repo_does_not_exist() {
 
     let r = s
         .create(&expected.name, &expected.description, &expected.creator)
+        .await
         .unwrap();
 
     assert_eq!(r, expected)
 }
 
-#[test]
-fn create_none_if_repo_already_exists() {
+#[tokio::test]
+async fn create_none_if_repo_already_exists() {
     let mut s = nuggit::storage::InMemory::new();
-    s.create("test", "", "").unwrap();
-    assert!(s.create("test", "", "").is_none());
+    s.create("test", "", "").await.unwrap();
+    let r = s.create("test", "", "").await;
+    assert!(r.is_none());
 }
 
-#[test]
-fn retrieve_none_if_repo_does_not_exist() {
+#[tokio::test]
+async fn retrieve_none_if_repo_does_not_exist() {
     let s = nuggit::storage::InMemory::new();
-    assert!(s.retrieve("test").is_none());
+    let r = s.retrieve("test").await;
+    assert!(r.is_none());
 }
 
-#[test]
-fn retrieve_some_if_repo_exists() {
+#[tokio::test]
+async fn retrieve_some_if_repo_exists() {
     let mut s = nuggit::storage::InMemory::new();
 
     let expected = nuggit::Repo {
@@ -60,9 +63,10 @@ fn retrieve_some_if_repo_exists() {
     };
 
     s.create(&expected.name, &expected.description, &expected.creator)
+        .await
         .unwrap();
 
-    let r = s.retrieve(&expected.name).unwrap();
+    let r = s.retrieve(&expected.name).await.unwrap();
 
     assert_eq!(r, expected)
 }

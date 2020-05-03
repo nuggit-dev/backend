@@ -18,56 +18,57 @@ extern crate nuggit;
 
 use nuggit::service::Error;
 use nuggit::Repo;
+use nuggit::Service;
 
 mod mock;
 
-#[test]
-fn create_error_if_name_is_not_ascii() {
+#[tokio::test]
+async fn create_error_if_name_is_not_ascii() {
     let m: mock::storage::Mock = Default::default();
-    let mut s = nuggit::Service::new(m);
+    let mut s = nuggit::Nuggit::new(m);
 
     // Note the fancy f!
     let name = "ƒoo";
-    let err = s.create(name, "", "").err();
+    let err = s.create(name, "", "").await.err();
     assert!(err.is_some());
     assert_eq!(err.unwrap(), Error::InvalidName);
 }
 
-#[test]
-fn create_error_if_name_is_too_long() {
+#[tokio::test]
+async fn create_error_if_name_is_too_long() {
     let m: mock::storage::Mock = Default::default();
-    let mut s = nuggit::Service::new(m);
+    let mut s = nuggit::Nuggit::new(m);
 
     let name = "t".repeat(65);
-    let err = s.create(name.as_str(), "", "").err();
+    let err = s.create(name.as_str(), "", "").await.err();
     assert!(err.is_some());
     assert_eq!(err.unwrap(), Error::InvalidName);
 }
 
-#[test]
-fn create_error_if_name_is_empty() {
+#[tokio::test]
+async fn create_error_if_name_is_empty() {
     let m: mock::storage::Mock = Default::default();
-    let mut s = nuggit::Service::new(m);
+    let mut s = nuggit::Nuggit::new(m);
 
     let name = "";
-    let err = s.create(name, "", "").err();
+    let err = s.create(name, "", "").await.err();
     assert!(err.is_some());
     assert_eq!(err.unwrap(), Error::InvalidName);
 }
 
-#[test]
-fn create_error_if_description_is_too_long() {
+#[tokio::test]
+async fn create_error_if_description_is_too_long() {
     let m: mock::storage::Mock = Default::default();
-    let mut s = nuggit::Service::new(m);
+    let mut s = nuggit::Nuggit::new(m);
 
     let description = "t".repeat(257);
-    let err = s.create("test", description.as_str(), "").err();
+    let err = s.create("test", description.as_str(), "").await.err();
     assert!(err.is_some());
     assert_eq!(err.unwrap(), Error::InvalidDescription);
 }
 
-#[test]
-fn create_ok_if_description_is_empty() {
+#[tokio::test]
+async fn create_ok_if_description_is_empty() {
     let create_fn = || {
         Some(Repo {
             ..Default::default()
@@ -77,28 +78,28 @@ fn create_ok_if_description_is_empty() {
         create_fn: Some(create_fn),
         retrieve_fn: None,
     };
-    let mut s = nuggit::Service::new(m);
+    let mut s = nuggit::Nuggit::new(m);
 
     let description = "";
-    assert!(s.create("test", description, "").is_ok());
+    assert!(s.create("test", description, "").await.is_ok());
 }
 
-#[test]
-fn create_error_if_storage_returns_none() {
+#[tokio::test]
+async fn create_error_if_storage_returns_none() {
     let create_fn = || None;
     let m = mock::storage::Mock {
         create_fn: Some(create_fn),
         retrieve_fn: None,
     };
-    let mut s = nuggit::Service::new(m);
+    let mut s = nuggit::Nuggit::new(m);
 
-    let err = s.create("test", "", "").err();
+    let err = s.create("test", "", "").await.err();
     assert!(err.is_some());
     assert_eq!(err.unwrap(), Error::AlreadyExists);
 }
 
-#[test]
-fn create_ok_if_storage_returns_some() {
+#[tokio::test]
+async fn create_ok_if_storage_returns_some() {
     let create_fn = || {
         Some(Repo {
             name: String::from("some"),
@@ -111,9 +112,9 @@ fn create_ok_if_storage_returns_some() {
         create_fn: Some(create_fn),
         retrieve_fn: None,
     };
-    let mut s = nuggit::Service::new(m);
+    let mut s = nuggit::Nuggit::new(m);
 
-    let r = s.create("test", "", "").unwrap();
+    let r = s.create("test", "", "").await.unwrap();
     assert_eq!(
         r,
         Repo {
@@ -125,22 +126,22 @@ fn create_ok_if_storage_returns_some() {
     );
 }
 
-#[test]
-fn retrieve_error_if_storage_returns_none() {
+#[tokio::test]
+async fn retrieve_error_if_storage_returns_none() {
     let retrieve_fn = || None;
     let m = mock::storage::Mock {
         create_fn: None,
         retrieve_fn: Some(retrieve_fn),
     };
-    let s = nuggit::Service::new(m);
+    let s = nuggit::Nuggit::new(m);
 
-    let err = s.retrieve("test").err();
+    let err = s.retrieve("test").await.err();
     assert!(err.is_some());
     assert_eq!(err.unwrap(), Error::NotFound);
 }
 
-#[test]
-fn retrieve_ok_if_storage_returns_some() {
+#[tokio::test]
+async fn retrieve_ok_if_storage_returns_some() {
     let retrieve_fn = || {
         Some(Repo {
             name: String::from("some"),
@@ -153,9 +154,9 @@ fn retrieve_ok_if_storage_returns_some() {
         create_fn: None,
         retrieve_fn: Some(retrieve_fn),
     };
-    let s = nuggit::Service::new(m);
+    let s = nuggit::Nuggit::new(m);
 
-    let r = s.retrieve("test").unwrap();
+    let r = s.retrieve("test").await.unwrap();
     assert_eq!(
         r,
         Repo {

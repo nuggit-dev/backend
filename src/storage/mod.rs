@@ -15,13 +15,15 @@
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 use crate::Repo;
+use async_trait::async_trait;
 
-/// Stores repository metadata.
-pub trait Storage {
-    /// Creates a repository.
-    fn create(&mut self, name: &str, description: &str, creator: &str) -> Option<Repo>;
-    /// Retrieves a repository.
-    fn retrieve(&self, name: &str) -> Option<Repo>;
+/// Represents storage of repository metadata.
+#[async_trait]
+pub trait Storage: Send + Sync + Clone {
+    /// Create a repository.
+    async fn create(&mut self, name: &str, description: &str, creator: &str) -> Option<Repo>;
+    /// Retrieve a repository.
+    async fn retrieve(&self, name: &str) -> Option<Repo>;
 }
 
 pub mod inmemory;

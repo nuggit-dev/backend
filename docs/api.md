@@ -17,7 +17,7 @@ You can retrieve individual repos as well as list all repos.
 | `creator` | `string` | ID of the user who created the repository. |
 | `created` | `string` | Date and time at which the repository was created. This must be formatted as [ISO 8601](https://en.wikipedia.org/wiki/ISO_8601). |
 
-### Create a repo
+### Create a repository
 
 To create a repository, you create a `Repo` object.
 
@@ -55,7 +55,7 @@ curl https://api.nuggit.dev/repos \
 }
 ```
 
-### Retrieve a repo
+### Retrieve a repository
 
 Retrieves the details of an existing repository.
 
@@ -82,7 +82,7 @@ curl https://api.nuggit.dev/repos/frombus
 }
 ```
 
-### List repos
+### List repositories
 
 Returns a list of your repositories.
 The repositories are returned sorted by creation date, with the most recent repositories appearing first.
@@ -118,7 +118,7 @@ curl https://api.nuggit.dev/repos
 ]
 ```
 
-### Delete a repo
+### Delete a repository
 
 Permanently deletes a repository.
 It cannot be undone.

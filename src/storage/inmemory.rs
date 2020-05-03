@@ -14,33 +14,45 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+use std::collections::HashMap;
+use std::sync::Arc;
+
+use tokio::sync::RwLock;
+
+use async_trait::async_trait;
+
 use crate::storage::Storage;
 use crate::Repo;
-use std::collections::HashMap;
 
 /// Implements in-memory storage of repository metadata.
-/// Note, that this storage is neither thread-safe nor efficient.
+/// Note, that the implementation is not efficient because it does a lot of copying.
 /// It's only meant for testing.
+#[derive(Clone)]
 pub struct InMemory {
-    s: HashMap<String, Repo>,
+    map: Arc<RwLock<HashMap<String, Repo>>>,
 }
 
 impl InMemory {
     /// Creates an empty storage.
     pub fn new() -> InMemory {
-        InMemory { s: HashMap::new() }
+        InMemory {
+            map: Arc::new(RwLock::new(HashMap::new())),
+        }
     }
 }
 
+#[async_trait]
 impl Storage for InMemory {
     /// Creates a repository.
-    fn create(&mut self, name: &str, description: &str, creator: &str) -> Option<Repo> {
-        if self.s.contains_key(name) {
+    async fn create(&mut self, name: &str, description: &str, creator: &str) -> Option<Repo> {
+        let mut map = self.map.write().await;
+
+        if map.contains_key(name) {
             return None;
         }
 
         let created = "2020-04-28T13:48:01.778470";
-        self.s.insert(
+        map.insert(
             name.to_owned(),
             Repo {
                 name: name.to_owned(),
@@ -59,8 +71,9 @@ impl Storage for InMemory {
     }
 
     /// Retrieves a repository.
-    fn retrieve(&self, name: &str) -> Option<Repo> {
-        match self.s.get(name) {
+    async fn retrieve(&self, name: &str) -> Option<Repo> {
+        let map = self.map.read().await;
+        match map.get(name) {
             Some(r) => Some(r.clone()),
             None => None,
         }

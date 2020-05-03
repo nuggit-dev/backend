@@ -14,10 +14,11 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+use async_trait::async_trait;
 use nuggit::{Repo, Storage};
 
 /// Mocks a storage.
-#[derive(Default)]
+#[derive(Clone, Default)]
 pub struct Mock {
     /// If set, the result of calling this function will be returned from `create()`.
     pub create_fn: Option<fn() -> Option<Repo>>,
@@ -25,10 +26,11 @@ pub struct Mock {
     pub retrieve_fn: Option<fn() -> Option<Repo>>,
 }
 
+#[async_trait]
 impl Storage for Mock {
     /// Calls `create_fn` if it is not `None` and returns the result.
     /// Returns `None` otherwise.
-    fn create(&mut self, _name: &str, _description: &str, _creator: &str) -> Option<Repo> {
+    async fn create(&mut self, _name: &str, _description: &str, _creator: &str) -> Option<Repo> {
         if let Some(f) = self.create_fn {
             return f();
         }
@@ -37,7 +39,7 @@ impl Storage for Mock {
 
     /// Calls `retrieve_fn` if it is not `None` and returns the result.
     /// Returns `None` otherwise.
-    fn retrieve(&self, _name: &str) -> Option<Repo> {
+    async fn retrieve(&self, _name: &str) -> Option<Repo> {
         if let Some(f) = self.retrieve_fn {
             return f();
         }

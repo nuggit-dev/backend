@@ -14,8 +14,8 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-use crate::storage::Storage;
 use crate::Repo;
+use async_trait::async_trait;
 
 /// Represents a service error.
 #[derive(Debug, PartialEq)]
@@ -28,37 +28,19 @@ pub enum Error {
     InvalidName,
     /// Returned if repository description is invalid.
     InvalidDescription,
+    /// Returned if a method is not implemented.
+    NotImplemented,
 }
 
-/// Manages repositories and their metadata.
-pub struct Service<T: Storage> {
-    storage: T,
+/// Represents a service that manages repositories and their metadata.
+#[async_trait]
+pub trait Service: Send + Sync + Clone {
+    /// Create a repository.
+    async fn create(&mut self, name: &str, description: &str, creator: &str)
+        -> Result<Repo, Error>;
+    /// Retrieve a repository.
+    async fn retrieve(&self, name: &str) -> Result<Repo, Error>;
 }
 
-impl<T: Storage> Service<T> {
-    /// Creates a new service.
-    pub fn new(storage: T) -> Service<T> {
-        Service { storage }
-    }
-
-    /// Creates a repository if its `name` and `description` is valid.
-    pub fn create(&mut self, name: &str, description: &str, creator: &str) -> Result<Repo, Error> {
-        if name.is_empty() || name.len() > 64 || !name.is_ascii() {
-            return Err(Error::InvalidName);
-        }
-
-        // Description is UTF-8, so we count Unicode Scalar Values.
-        if description.chars().count() > 256 {
-            return Err(Error::InvalidDescription);
-        }
-
-        self.storage
-            .create(name, description, creator)
-            .ok_or(Error::AlreadyExists)
-    }
-
-    /// Retrieves a repository.
-    pub fn retrieve(&self, name: &str) -> Result<Repo, Error> {
-        self.storage.retrieve(name).ok_or(Error::NotFound)
-    }
-}
+pub mod nuggit;
+pub use self::nuggit::Nuggit;

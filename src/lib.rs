@@ -14,8 +14,10 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
+use serde::{Deserialize, Serialize};
+
 /// Represents repository metadata.
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize)]
 pub struct Repo {
     /// The name of the repository.
     pub name: String,
@@ -27,7 +29,10 @@ pub struct Repo {
     pub created: String,
 }
 
+pub mod endpoints;
+
 pub mod service;
+pub use service::Nuggit;
 pub use service::Service;
 
 pub mod storage;

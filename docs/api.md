@@ -3,7 +3,41 @@
 The Nuggit API is organized around REST.
 The API accepts JSON-encoded request bodies and returns JSON-encoded responses.
 
-## Repos
+## Errors
+
+The API uses conventional HTTP response codes to indicate the success or failure of an API request.
+In general, there are three status code ranges you can expect:
+* `2xx` confirms that your request worked as expected.
+* `4xx` indicates an error that failed given the information provided (e.g., a parameter is invalid, a repository already exists, etc.).
+* `5xx` indicates an error with the server (these are rare).
+
+### The error object
+
+| Name | Type | Description |
+|------|------|-------------|
+| `code` | `string` | A short string with a brief explanation of the error. See [error codes](#error-codes) for details. |
+| `message` | `string` | A human-readable message providing more details about the error. |
+
+### Error codes
+
+The following list describes some error codes that could be handled programmatically, along with additional information about how to resolve them.
+
+* `repo_exists`
+
+    The repository `name` provided already exists.
+    Use a different, unique value for `name` and try again.
+
+* `repo_name_invalid`
+
+    The repository `name` provided is invalid.
+    See error `message` for validation details.
+
+* `repo_description_invalid`
+
+    The repository `description` provided is invalid.
+    See error `message` for validation details.
+
+## Repositories
 
 To create a repository, you create a `Repo` object.
 You can retrieve individual repos as well as list all repos.
@@ -138,5 +172,5 @@ curl https://api.nuggit.dev/repos/frombus \
 
 **Example response**
 
-Returns an empty response with `200 OK` HTTP response code.
+Returns an empty response with `200 OK` HTTP status code.
 If the repository `name` doesn't exist, this call returns an error.

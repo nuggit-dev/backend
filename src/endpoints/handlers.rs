@@ -24,7 +24,7 @@ use crate::{service, Service};
 
 impl warp::reject::Reject for service::Error {}
 
-/// Represents a repository creation request.
+/// A repository creation request.
 #[derive(Serialize, Deserialize, Default)]
 pub struct CreateRepoRequest {
     /// The name of the repository.
@@ -34,7 +34,7 @@ pub struct CreateRepoRequest {
     pub description: String,
 }
 
-/// Represents a response indicating an error.
+/// A response indicating an error.
 #[derive(Serialize, Deserialize)]
 pub struct ErrorResponse {
     /// A short string with a brief explanation of the error.
@@ -79,8 +79,8 @@ pub async fn handle_rejection(err: Rejection) -> Result<impl Reply, Infallible> 
     if let Some(e) = err.find::<service::Error>() {
         match e {
             service::Error::NotFound => {
-                code = "repo_not_found";
-                message = "The repository with such name was not found.";
+                code = "not_found";
+                message = "The requested URL was not found on this server.";
                 status = StatusCode::NOT_FOUND;
             }
             service::Error::AlreadyExists => {
@@ -89,13 +89,13 @@ pub async fn handle_rejection(err: Rejection) -> Result<impl Reply, Infallible> 
                 status = StatusCode::CONFLICT;
             }
             service::Error::InvalidName => {
-                code = "invalid_repo_name";
+                code = "repo_name_invalid";
                 message =
                     "Repository name is invalid. It must be an ASCII string up to 64 characters.";
                 status = StatusCode::BAD_REQUEST;
             }
             service::Error::InvalidDescription => {
-                code = "invalid_repo_description";
+                code = "repo_description_invalid";
                 message =
                     "Repository description is invalid. It must be a UTF-8 encoded string up to 256 characters.";
                 status = StatusCode::BAD_REQUEST;
@@ -109,7 +109,11 @@ pub async fn handle_rejection(err: Rejection) -> Result<impl Reply, Infallible> 
     }
     // warp rejections.
     // Maybe there's a better way than calling `err.find()` this many times.
-    else if let Some(_) = err.find::<warp::reject::InvalidHeader>() {
+    else if err.is_not_found() {
+        code = "not_found";
+        message = "The requested URL was not found on this server.";
+        status = StatusCode::NOT_FOUND;
+    } else if let Some(_) = err.find::<warp::reject::InvalidHeader>() {
         code = "bad_request";
         message = "Request header is invalid.";
         status = StatusCode::BAD_REQUEST;

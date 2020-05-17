@@ -9,6 +9,19 @@ use nuggit::Repo;
 mod mock;
 
 #[tokio::test]
+async fn error_if_url_doesn_not_exist() {
+    let storage = nuggit::storage::InMemory::new();
+    let service = nuggit::Nuggit::new(storage);
+    let api = nuggit::endpoints::make(service);
+
+    let resp = request().method("GET").path("/test").reply(&api).await;
+    let err: ErrorResponse = serde_json::from_slice(resp.body()).unwrap();
+
+    assert_eq!(resp.status(), StatusCode::NOT_FOUND);
+    assert_eq!(err.code, "not_found");
+}
+
+#[tokio::test]
 async fn create_repo_error_if_method_is_not_allowed() {
     let storage = nuggit::storage::InMemory::new();
     let service = nuggit::Nuggit::new(storage);
@@ -157,7 +170,7 @@ async fn create_repo_error_if_repo_name_is_empty() {
     let err: ErrorResponse = serde_json::from_slice(resp.body()).unwrap();
 
     assert_eq!(resp.status(), StatusCode::BAD_REQUEST);
-    assert_eq!(err.code, "invalid_repo_name");
+    assert_eq!(err.code, "repo_name_invalid");
 }
 
 #[tokio::test]
@@ -179,7 +192,7 @@ async fn create_repo_error_if_repo_name_is_too_long() {
     let err: ErrorResponse = serde_json::from_slice(resp.body()).unwrap();
 
     assert_eq!(resp.status(), StatusCode::BAD_REQUEST);
-    assert_eq!(err.code, "invalid_repo_name");
+    assert_eq!(err.code, "repo_name_invalid");
 }
 
 #[tokio::test]
@@ -202,7 +215,7 @@ async fn create_repo_error_if_repo_name_is_not_ascii() {
     let err: ErrorResponse = serde_json::from_slice(resp.body()).unwrap();
 
     assert_eq!(resp.status(), StatusCode::BAD_REQUEST);
-    assert_eq!(err.code, "invalid_repo_name");
+    assert_eq!(err.code, "repo_name_invalid");
 }
 
 #[tokio::test]
@@ -262,7 +275,7 @@ async fn create_repo_error_if_repo_description_is_too_long() {
     let err: ErrorResponse = serde_json::from_slice(resp.body()).unwrap();
 
     assert_eq!(resp.status(), StatusCode::BAD_REQUEST);
-    assert_eq!(err.code, "invalid_repo_description");
+    assert_eq!(err.code, "repo_description_invalid");
 }
 
 #[tokio::test]
@@ -424,7 +437,7 @@ async fn retrieve_repo_error_if_repo_doesn_not_exist() {
     let err: ErrorResponse = serde_json::from_slice(resp.body()).unwrap();
 
     assert_eq!(resp.status(), StatusCode::NOT_FOUND);
-    assert_eq!(err.code, "repo_not_found");
+    assert_eq!(err.code, "not_found");
 }
 
 #[tokio::test]
